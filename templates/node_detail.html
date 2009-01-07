@@ -1,0 +1,45 @@
+<h1>{{ node.name }}</h1>
+
+<a href="../../applications">Back up to index</a>
+
+<ul>
+    <li>
+        <strong>Responsible Party</strong>: {{ responsible_party|safe }} 
+    </li>
+    {% if parents or children %}
+    <li>
+        {% if parents %}
+        <strong>Parents</strong>: 
+        <ul>
+            {% for parent in parents %}
+                <li>
+                    <a href="{{ parent.parent|urlencode }}">{{parent.parent}}</a>
+                    ->
+                    <a href="{{ parent.child|urlencode }}">{{parent.child}}</a>
+                    {% if parent.edge_type %}                
+                        ( {{parent.edge_type}} )
+                    {% endif %}
+                </li>
+            {% endfor %}            
+        </ul>
+        {% endif %}
+        {% if children %}
+        <strong>Children</strong>: 
+        <ul>
+            {% for child in children %}
+                <li>
+                    <a href="{{ child.parent|urlencode }}">{{child.parent}}</a>
+                    ->
+                    <a href="{{ child.child|urlencode }}">{{child.child}}</a>    
+                    {% if child.edge_type %}                
+                        ( {{child.edge_type}} )
+                    {% endif %}                                    
+                </li>
+            {% endfor %}            
+        </ul>
+        {% endif %}   
+    </li>
+    {% endif %}
+</ul>
+
+<img src="../graph/{{node.name|urlencode}}.gif" border="0" />
