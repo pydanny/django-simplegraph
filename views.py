@@ -2,6 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from simplegraph.models import Node
 from simplegraph import graphviz
+from pydot import Graph, Edge
+from pydot import Node as GNode
 
 ############# utility ###############
 
@@ -66,7 +68,46 @@ def nodes_and_edges_to_dot():
     for edge in edges:
         dot += '%s -- %s [arrowhead=vee];' % (edge[0], edge[1])
     dot += '}'
-    return dot    
+    return dot
+    
+############## new utils ###########    
+    
+def get_node(name):
+    node = GNode(cleanup(name))
+    orm_node = Node.objects.select_related().get(name=name)    
+    node.set_color(orm_node.node_look.color)
+    node.set_shape(orm_node.node_look.shape)
+    node.set_style('filled')
+    return node
+    
+def get_node_and_edges(name):
+    graph = Graph(cleanup(name))
+    orm_node = Node.objects.select_related().get(name=name)    
+    other_nodes = [x for x in orm_node.parent.iterator()]
+    other_nodes += [x for x in orm_node.child.iterator()]
+    edges = []
+    node_check = [] # used to make sure we don't add the same node twice
+    for other_node in other_nodes:
+        if other_node.parent.name not in node_check:
+            graph.add_node(get_node(other_node.parent.name))
+            node_check.append(other_node.parent.name)
+        if other_node.child.name not in node_check:
+            graph.add_node(get_node(other_node.child.name))        
+            node_check.append(other_node.child.name)
+            
+        # edges are tuples
+        edges.append((cleanup(other_node.parent.name),cleanup(other_node.child.name))) 
+        
+    edges = list(set(edges)) # remove duplicates
+    for edge in edges:
+        e = Edge(edge[0],edge[1])
+        e.set_arrowhead('vee')
+        graph.add_edge(e)
+    return graph
+
+    
+def get_nodes_and_edges(name):
+    pass
 
 ############# Views ###############
 
@@ -79,7 +120,8 @@ def dot_all(request):
     return render_to_response(nodes_and_edges_to_dot)
         
 def dot_node(request,name):
-    return render_to_response(node_and_edges_to_dot)
+    graph = get_node_and_edges(name)
+    return render_to_response('dot.html',{'dot_export':graph.to_string()})
             
 def node_detail(request,name):
     node = Node.objects.select_related().get(name=name)
@@ -103,6 +145,7 @@ def simplegraph_all(request,build_type='dot'):
     return HttpResponse(image,mimetype="image/gif")
     
 def simplegraph_detail(request,name,build_type='dot'):
-    image = graphviz.create_simplegraph(node_and_edges_to_dot(name),build_type=build_type)      
+    graph = get_node_and_edges(name)
+    image = graphviz.create_simplegraph(graph.to_string(),build_type=build_type)      
     return HttpResponse(image,mimetype="image/gif")
     
