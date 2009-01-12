@@ -26,7 +26,7 @@ def node_to_dot(node):
 def node_and_edges_to_dot(name):
     edges = []
     other_nodes = []
-    dot = 'simplegraph {\n'
+    dot = 'graph {\n'
     node = Node.objects.select_related().get(name=name)
     dot += node_to_dot(node)
     
@@ -51,7 +51,7 @@ def node_and_edges_to_dot(name):
     
 def nodes_and_edges_to_dot():
     edges = []
-    dot = 'simplegraph {\n'
+    dot = 'graph {\n'
     for node in Node.objects.select_related():
         # gets apps
         dot += node_to_dot(node)
