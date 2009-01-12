@@ -1,0 +1,21 @@
+
+
+{% block nav %}
+    <h1><a href="/">Home</a></h1>
+    
+    <ul>
+        <li><a href="/show_em_all">Show me everything</a></li>
+    </ul>        
+
+
+    <h1><a href="/">Nodes</a></h1>
+    {% if nodes %}
+        <ul>
+        {% for node in nodes %}
+            <li>
+                <a href="/node/{{ node.name|urlencode }}">{{ node.name }}</a>
+            </li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

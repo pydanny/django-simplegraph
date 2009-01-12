@@ -4,14 +4,19 @@ from simplegraph.models import Node
 from simplegraph import graphviz
 from pydot import Graph, Edge
 from pydot import Node as GNode
+import random
+from string import ascii_letters
 
 ############# utility ###############
 
-CLEANUP_TARGETS = ('.',' ','-')
+valid_after_cleanup = ascii_letters + '_0123456789'
+
+
 
 def cleanup(text):
-    for target in CLEANUP_TARGETS:
-        text = text.replace(target,'')
+    for char in text:
+        if char not in valid_after_cleanup:
+            text = text.replace(char,'')            
     return text
     
 
@@ -24,33 +29,7 @@ def node_to_dot(node):
         dot += ' style=filled color=%s shape=%s' % (node.node_look.color, node.node_look.shape)
     dot += '];\n'    
     return dot
-    
-def node_and_edges_to_dot(name):
-    edges = []
-    other_nodes = []
-    dot = 'graph {\n'
-    node = Node.objects.select_related().get(name=name)
-    dot += node_to_dot(node)
-    
-    for parent in node.parent.iterator():
-        edges.append((cleanup(parent.parent.name),cleanup(parent.child.name)))
-        other_nodes.append(parent.child)
-
-    for child in node.child.iterator():
-        edges.append((cleanup(child.parent.name),cleanup(child.child.name)))            
-        other_nodes.append(child.parent)        
-
-    # remove duplicates        
-    edges = list(set(edges))
-
-    for node in other_nodes:
-        dot += node_to_dot(node)
-
-    for edge in edges:
-        dot += '%s -- %s [arrowhead=vee];' % (edge[0], edge[1])
-    dot += '}'
-    return dot    
-    
+        
 def nodes_and_edges_to_dot():
     edges = []
     dot = 'graph {\n'
@@ -113,8 +92,12 @@ def get_nodes_and_edges(name):
 
 
 def index(request):
-    nodes = Node.objects.all().order_by('name')
+    nodes = Node.objects.all().order_by('name')    
     return render_to_response('index.html',{'nodes':nodes})
+
+def list_nodes(request):
+    nodes = Node.objects.all().order_by('name')
+    return render_to_response('list_nodes.html',{'nodes':nodes})
     
 def dot_all(request):
     return render_to_response(nodes_and_edges_to_dot)
@@ -124,6 +107,7 @@ def dot_node(request,name):
     return render_to_response('dot.html',{'dot_export':graph.to_string()})
             
 def node_detail(request,name):
+    nodes = Node.objects.all().order_by('name')        
     node = Node.objects.select_related().get(name=name)
     parents = [x for x in node.parent.iterator()]
     children = [x for x in node.child.iterator()]
@@ -136,6 +120,7 @@ def node_detail(request,name):
         responsible_party = node.responsible_party
     
     return render_to_response('node_detail.html',{'node':node,
+            'nodes':nodes,
             'parents':parents,
             'children':children,
             'responsible_party':responsible_party})
@@ -149,3 +134,12 @@ def simplegraph_detail(request,name,build_type='dot'):
     image = graphviz.create_simplegraph(graph.to_string(),build_type=build_type)      
     return HttpResponse(image,mimetype="image/gif")
     
+def random_image(request,build_type='dot'):
+    node = random.choice(Node.objects.all())
+    graph = get_node_and_edges(node.name)
+    image = graphviz.create_simplegraph(graph.to_string(),build_type=build_type)      
+    return HttpResponse(image,mimetype="image/gif")    
+    
+def show_em_all(request):
+    nodes = Node.objects.all().order_by('name')    
+    return render_to_response('show_em_all.html',{'nodes':nodes})    
