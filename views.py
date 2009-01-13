@@ -31,11 +31,15 @@ def node_to_dot(node):
     return dot
         
 def nodes_and_edges_to_dot():
+    graph = Graph(cleanup('everything'))    
     edges = []
+    node_check = []
     dot = 'graph {\n'
     for node in Node.objects.select_related():
-        # gets apps
+        # gets nodes
+        #node = Node(cleanup(node.name))
         dot += node_to_dot(node)
+
         for parent in node.parent.iterator():
             edges.append((cleanup(parent.parent.name),cleanup(parent.child.name)))
 
@@ -109,8 +113,8 @@ def dot_node(request,name):
 def node_detail(request,name):
     nodes = Node.objects.all().order_by('name')        
     node = Node.objects.select_related().get(name=name)
-    parents = [x for x in node.parent.iterator()]
-    children = [x for x in node.child.iterator()]
+    parents = [x for x in node.child.iterator()]
+    children = [x for x in node.parent.iterator()]
     responsible_party = None
     if node.responsible_party_email and node.responsible_party:
         responsible_party = '<a href="mailto:%s">%s</a>' % (node.responsible_party_email, node.responsible_party)
