@@ -13,5 +13,6 @@ urlpatterns = patterns('',
     url(r'^graph/([A-Za-z\d\s\.\-]{1,30}).gif$', 'simplegraph.views.simplegraph_detail'),                
     url(r'^random_image.gif$', 'simplegraph.views.random_image'),
     url(r'^csv/graph.csv$', 'simplegraph.views.csv_all'),                    
-    url(r'^csv/node/([A-Za-z\d\s\.\-]{1,30}).csv$', 'simplegraph.views.csv_node'),          
+    url(r'^csv/node/([A-Za-z\d\s\.\-]{1,30}).csv$', 'simplegraph.views.csv_node'),
+    url(r'^import_csv/$', 'simplegraph.views.import_csv'),    
 )

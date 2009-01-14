@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h1>Upload CSV</h1>
+
+<p>rules on specific format</p>
+
+
+<form action="" method="post" enctype="multipart/form-data">
+    <input type="file" name="import_file" />
+    <input type="submit" name="import" value="import" />
+</form>
+
+{{ files }}
+{% endblock  %}

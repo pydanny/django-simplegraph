@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
-from simplegraph.models import Node, COLOR_CHOICES, SHAPE_CHOICES
+from simplegraph.models import Node, Edge, COLOR_CHOICES, SHAPE_CHOICES
 from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
@@ -66,19 +66,35 @@ def show_em_all(request):
     
 def csv_all(request):
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+    response['Content-Disposition'] = 'attachment; filename=export.csv'
     writer = csv.writer(response)
-    writer.writerow(['NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
+    writer.writerow(['NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
     for node in Node.objects.all().order_by('name'):
         writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
+    writer.writerow([])
+    writer.writerow(['EDGE_PARENT','EDGE_CHILD','EDGE_TYPE'])
+    for edge in Edge.objects.all():
+        writer.writerow([edge.parent,edge.child,edge.edge_type])
     return response
     
 def csv_node(request,name):
     response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+    response['Content-Disposition'] = 'attachment; filename=export.csv'
     writer = csv.writer(response)
-    writer.writerow(['NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
+    writer.writerow(['NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
     node = Node.objects.get(name=name)
     writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
     return response
     
+def import_csv(request):
+    if request.method == 'GET': 
+        nodes = Node.objects.all().order_by('name')    
+        return render_to_response('import_csv.html',{'nodes':nodes})
+    
+    if request.method == 'POST': 
+        nodes = Node.objects.all().order_by('name')
+        lines = []
+        for line in request.FILES['import_file'].readlines():
+            lines.append(line)
+        return render_to_response('import_csv.html',{'nodes':nodes,'files':lines})
+        
