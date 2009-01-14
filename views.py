@@ -71,7 +71,14 @@ def csv_all(request):
     writer.writerow(['NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
     for node in Node.objects.all().order_by('name'):
         writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
-         
-
+    return response
+    
+def csv_node(request,name):
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=somefilename.csv'
+    writer = csv.writer(response)
+    writer.writerow(['NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
+    node = Node.objects.get(name=name)
+    writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
     return response
     
