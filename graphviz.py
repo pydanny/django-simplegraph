@@ -7,6 +7,13 @@ Created by Daniel Greenfeld on 2009-12-3.
 import os
 import tempfile
 
+from pydot import Graph, Edge
+from pydot import Node as GNode
+from string import ascii_letters
+from simplegraph.models import Node
+
+valid_after_cleanup = ascii_letters + '_0123456789'
+
 def find_graphviz():
 	"""Locate graphviz's executables in the system.
 
@@ -52,6 +59,69 @@ def create_simplegraph(input_dot,format='gif',build_type='dot'):
     stdout.close()
     os.unlink(tmp_name)
     return data
+
+
+
+
+def cleanup(text):
+    for char in text:
+        if char not in valid_after_cleanup:
+            text = text.replace(char,'')            
+    return text
+
+def get_node(name):
+    # modify to accept orm_nodes
+    node = GNode(cleanup(name))
+    orm_node = Node.objects.select_related().get(name=name)    
+    node.set_color(orm_node.node_look.color)
+    node.set_shape(orm_node.node_look.shape)
+    node.set_style('filled')
+    return node
+
+def get_node_and_edges(name):
+    graph = Graph(cleanup(name))
+    orm_node = Node.objects.select_related().get(name=name)    
+    other_nodes = [x for x in orm_node.parent.iterator()]
+    other_nodes += [x for x in orm_node.child.iterator()]
+    edges = []
+    node_check = [] # used to make sure we don't add the same node twice
+    for other_node in other_nodes:
+        if other_node.parent.name not in node_check:
+            graph.add_node(get_node(other_node.parent.name))
+            node_check.append(other_node.parent.name)
+        if other_node.child.name not in node_check:
+            graph.add_node(get_node(other_node.child.name))        
+            node_check.append(other_node.child.name)
+
+        # edges are tuples
+        edges.append((cleanup(other_node.parent.name),cleanup(other_node.child.name))) 
+
+    edges = list(set(edges)) # remove duplicates
+    for edge in edges:
+        e = Edge(edge[0],edge[1])
+        e.set_arrowhead('vee')
+        graph.add_edge(e)
+    return graph
+
+
+def get_nodes_and_edges(name='my_graph'):
+    graph = Graph(cleanup(name))
+    edges = []
+    for orm_node in Node.objects.select_related():
+        graph.add_node(get_node(orm_node.name))
+        for parent in orm_node.parent.iterator():
+            edges.append((cleanup(parent.parent.name),cleanup(parent.child.name)))
+
+        for child in orm_node.child.iterator():
+            edges.append((cleanup(child.parent.name),cleanup(child.child.name)))            
+
+    edges = list(set(edges)) # remove duplicates   
+    for edge in edges:
+        e = Edge(edge[0],edge[1])
+        e.set_arrowhead('vee')
+        graph.add_edge(e)            
+    return graph
+    
     
 if __name__ == '__main__':
     print find_graphviz()

@@ -49,9 +49,21 @@
                 <h1>Random Data Image</h1>
                 <p>
                     <img src="/random_image.gif" alt="random image" border="1" />
-
                 <p>
                 <p><a href="">Click to see another</a></p>
+                <h1>Color Options (many more to come)</h1>
+                <p>
+                    {% for color in colors %}
+                        {{ color }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </p>
+                <h1>Shape Options</h1>
+                <p>
+                    {% for shape in shapes %}
+                        {{ shape }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                </p>
+                
             {% endblock %} 
 				
 		</div>

@@ -11,5 +11,6 @@ urlpatterns = patterns('',
     url(r'^show_em_all$', 'simplegraph.views.show_em_all'),         # big pretty picture    
     url(r'^graph_all.gif$', 'simplegraph.views.simplegraph_all'),                    # simplegraph_all nodes   
     url(r'^graph/([A-Za-z\d\s\.\-]{1,30}).gif$', 'simplegraph.views.simplegraph_detail'),                
-    url(r'^random_image.gif$', 'simplegraph.views.random_image'),                    
+    url(r'^random_image.gif$', 'simplegraph.views.random_image'),
+    url(r'^csv/graph.csv$', 'simplegraph.views.csv_all'),                    
 )

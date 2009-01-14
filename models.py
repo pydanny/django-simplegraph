@@ -1,11 +1,17 @@
 from django.db import models
 
 COLOR_CHOICES = (
+    ('blueviolet','blueviolet'),
+    ('cornsilk','cornsilk'),
+    ('deeppink','deeppink'),
     ('grey93', 'grey93'),
     ('lawngreen', 'lawngreen'),
     ('lightblue', 'lightblue'),
+    ('red','red'),
+    ('seagreen1','seagreen1'),
+    ('skyblue','skyblue'),
     ('yellow', 'yellow'),
-    ('white', 'white'),    
+    ('white', 'white'), 
 )
 
 SHAPE_CHOICES = (
