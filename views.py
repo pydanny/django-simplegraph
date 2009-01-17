@@ -5,6 +5,9 @@ from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
 import csv
+from simplegraph.utils import get_rows_from_csv
+from simplegraph.forms import NodeForm
+
 ############# Views ###############
 
 
@@ -46,8 +49,8 @@ def node_detail(request,name):
     
 def simplegraph_all(request,build_type='dot'):
     graph = get_nodes_and_edges()
-    image = graphviz.create_simplegraph(graph.to_string(),build_type=build_type)      
-    return HttpResponse(image,mimetype="image/gif")
+    image = graphviz.create_simplegraph(graph.to_string(),format='svg',build_type=build_type)      
+    return HttpResponse(image,mimetype="image/svg+xml")
     
 def simplegraph_detail(request,name,build_type='dot'):
     graph = get_node_and_edges(name)
@@ -68,33 +71,71 @@ def csv_all(request):
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=export.csv'
     writer = csv.writer(response)
-    writer.writerow(['NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
+    writer.writerow(['NODE_ID','NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
     for node in Node.objects.all().order_by('name'):
-        writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
+        writer.writerow([node.pk,node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
     writer.writerow([])
-    writer.writerow(['EDGE_PARENT','EDGE_CHILD','EDGE_TYPE'])
+    writer.writerow(['EDGE_ID','EDGE_PARENT','EDGE_CHILD','EDGE_TYPE'])
     for edge in Edge.objects.all():
-        writer.writerow([edge.parent,edge.child,edge.edge_type])
+        writer.writerow([edge.pk,edge.parent,edge.child,edge.edge_type])
     return response
     
 def csv_node(request,name):
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=export.csv'
     writer = csv.writer(response)
-    writer.writerow(['NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
+    writer.writerow(['NODE_ID','NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
     node = Node.objects.get(name=name)
-    writer.writerow([node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
+    writer.writerow([node.pk,node.name, node.responsible_party, node.responsible_party_email, node.node_look, node.description])
     return response
     
 def import_csv(request):
+    stock_nodes = Node.objects.all().order_by('name')    
     if request.method == 'GET': 
-        nodes = Node.objects.all().order_by('name')    
-        return render_to_response('import_csv.html',{'nodes':nodes})
+        
+        return render_to_response('import_csv.html',{'nodes':stock_nodes})
     
     if request.method == 'POST': 
-        nodes = Node.objects.all().order_by('name')
-        lines = []
-        for line in request.FILES['import_file'].readlines():
-            lines.append(line)
-        return render_to_response('import_csv.html',{'nodes':nodes,'files':lines})
+        report = []
+        row_type = ''
+        for i,row in enumerate(csv.reader(request.FILES['import_file'])):
+            if (i == 0) and row[0] == 'NODE_ID':
+                row_type = 'NODE'
+                continue
+            try:
+                if (i > 0) and row[0] == 'EDGE_ID':
+                    row_type = 'EDGE'
+                    continue
+            except:
+                continue
+ 
+            if row_type == 'NODE':
+                nodes = Node.objects.filter(pk=row[0])
+                if not nodes:
+                    # add a node
+                    pass
+                elif len(nodes) == 1:
+                    # edit a node
+                    node = nodes[0]
+
+                    node.name = row[1] #'NODE_NAME'
+                    node.responsible_party = row[2]
+                    node.responsible_party_email = row[2]
+                    node.description = row[4]
+                    node.save()
+                    report.append(row[1] + ' updated.')
+                else:
+                    # report a problem
+                    pass
+
+                
+            if row_type == 'EDGE':
+                pass
+ 
+            
+        return render_to_response('import_csv.html',{'nodes':stock_nodes,'report':report})
         
+def edit_node(request,name):
+    stock_nodes = Node.objects.all().order_by('name')     
+    node_form = NodeForm()
+    return render_to_response('edit_node.html',{'nodes':stock_nodes,'node_form':node_form})    

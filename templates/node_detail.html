@@ -2,7 +2,14 @@
 
 {% block main %}
 
-<h1>{{ node.name }}</h1>
+<h1>{{ node.name }}
+    
+    {% if request.user.is_authenticated %}
+    ( <a href="">Edit Node</a>)
+    {% endif %}
+</h1>
+
+<p>{{ request.user }}</p>
 
 <p>
 <ul>

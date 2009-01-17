@@ -12,5 +12,12 @@
     <input type="submit" name="import" value="import" />
 </form>
 
-{{ files }}
+{% if report %}
+    <ul>
+    {% for line in report %}
+        <li>{{ line }}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
 {% endblock  %}

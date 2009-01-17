@@ -10,7 +10,10 @@ import tempfile
 from pydot import Graph, Edge
 from pydot import Node as GNode
 from string import ascii_letters
-from simplegraph.models import Node
+try:
+    from simplegraph.models import Node
+except:
+    pass
 
 valid_after_cleanup = ascii_letters + '_0123456789'
 
@@ -73,6 +76,7 @@ def get_node(name):
     # modify to accept orm_nodes
     node = GNode(cleanup(name))
     orm_node = Node.objects.select_related().get(name=name)    
+    node.set_URL('/node/'+name)        
     node.set_color(orm_node.node_look.color)
     node.set_shape(orm_node.node_look.shape)
     node.set_style('filled')
@@ -128,5 +132,5 @@ if __name__ == '__main__':
     dot = """simplegraph uml {
     	one -- two;
     }"""
-    t = create_simplegraph(dot)
+    t = create_simplegraph(dot,format='svg')
     print len(t)
