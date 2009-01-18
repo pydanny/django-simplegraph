@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from simplegraph.models import Node, Edge, COLOR_CHOICES, SHAPE_CHOICES
 from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
@@ -7,6 +7,14 @@ import random
 import csv
 from simplegraph.utils import get_rows_from_csv
 from simplegraph.forms import NodeForm
+
+
+############# Basics ############
+
+IMAGE_TYPES = {
+    'svg':dict(format='svg',mimetype="image/svg+xml"),
+    'gif':dict(format='gif',mimetype="image/gif")
+    }
 
 ############# Views ###############
 
@@ -47,15 +55,23 @@ def node_detail(request,name):
             'children':children,
             'responsible_party':responsible_party})
     
-def simplegraph_all(request,build_type='dot'):
+def graph_all(request,format,build_type='dot'):
     graph = get_nodes_and_edges()
-    image = graphviz.create_simplegraph(graph.to_string(),format='svg',build_type=build_type)      
-    return HttpResponse(image,mimetype="image/svg+xml")
+    format = IMAGE_TYPES[format]['format']
+    mimetype = IMAGE_TYPES[format]#['mimetype']    
+    image = graphviz.create_simplegraph(graph.to_string(),
+        format=format,
+        build_type=build_type)
+    return HttpResponse(image,mimetype=mimetype)
     
-def simplegraph_detail(request,name,build_type='dot'):
+def graph_detail(request,name,format,build_type='dot'):
     graph = get_node_and_edges(name)
-    image = graphviz.create_simplegraph(graph.to_string(),build_type=build_type)      
-    return HttpResponse(image,mimetype="image/gif")
+    format = IMAGE_TYPES[format]['format']
+    mimetype = IMAGE_TYPES[format]['mimetype']    
+    image = graphviz.create_simplegraph(graph.to_string(),
+        format = format,
+    build_type=build_type)      
+    return HttpResponse(image,mimetype=mimetype)
     
 def random_image(request,build_type='dot'):
     node = random.choice(Node.objects.all())
@@ -64,8 +80,19 @@ def random_image(request,build_type='dot'):
     return HttpResponse(image,mimetype="image/gif")    
     
 def show_em_all(request):
-    nodes = Node.objects.all().order_by('name')    
-    return render_to_response('show_em_all.html',{'nodes':nodes})    
+    nodes = Node.objects.all().order_by('name')
+    # test
+    graph = get_nodes_and_edges()   
+    image = graphviz.create_simplegraph(graph.to_string(),
+        format='svg',
+        build_type='dot')  
+    ugly = image.index("Pages: 1 -->")  
+    image = image[ugly+12:-1]
+    from django.utils.safestring import mark_safe
+    image = mark_safe(image)
+    
+    # emdtest
+    return render_to_response('show_em_all.html',{'nodes':nodes,'image':image})    
     
 def csv_all(request):
     response = HttpResponse(mimetype='text/csv')
@@ -136,6 +163,9 @@ def import_csv(request):
         return render_to_response('import_csv.html',{'nodes':stock_nodes,'report':report})
         
 def edit_node(request,name):
-    stock_nodes = Node.objects.all().order_by('name')     
-    node_form = NodeForm()
-    return render_to_response('edit_node.html',{'nodes':stock_nodes,'node_form':node_form})    
+    stock_nodes = Node.objects.all().order_by('name') 
+    node = get_object_or_404(Node, name=name)      
+    if request.method == 'POST':
+        node.save()                        
+    node_form = NodeForm(instance=node)        
+    return render_to_response('node_form.html',{'nodes':stock_nodes,'node_form':node_form})    

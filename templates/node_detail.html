@@ -7,6 +7,7 @@
     {% if request.user.is_authenticated %}
     ( <a href="">Edit Node</a>)
     {% endif %}
+    ( <a href="/edit/node/{{ node.name|urlencode }}">Edit Node</a>)    
 </h1>
 
 <p>{{ request.user }}</p>
@@ -52,8 +53,10 @@
     {% endif %}
 </ul>
 
-
-<img src="/graph/{{node.name|urlencode}}.gif" border="1" />
+<a href="/graph/{{node.name|urlencode}}.svg">
+    <img src="/graph/{{node.name|urlencode}}.gif"
+    alt = "Click to get mapped graphic" border="1" />
+</a>
 </p>
 <h1>Other formats</h1>
 <p>
