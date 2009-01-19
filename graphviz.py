@@ -49,7 +49,7 @@ def create_simplegraph(input_dot,format='gif',build_type='dot'):
     if not dot:
         return None
     tmp_fd, tmp_name = tempfile.mkstemp()
-    tmp_name = 'simplegraph.test.gif'
+    tmp_name = 'simplegraph.test.file'
     os.close(tmp_fd)
     dot_file = file(tmp_name,'w+b')
     dot_file.write(input_dot)
@@ -76,7 +76,8 @@ def get_node(name):
     # modify to accept orm_nodes
     node = GNode(cleanup(name))
     orm_node = Node.objects.select_related().get(name=name)    
-    node.set_URL('/node/'+name)        
+    node.set_URL('/node/'+name)
+    node.set_target('_parent')   
     node.set_color(orm_node.node_look.color)
     node.set_shape(orm_node.node_look.shape)
     node.set_style('filled')

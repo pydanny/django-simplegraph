@@ -58,7 +58,7 @@ def node_detail(request,name):
 def graph_all(request,format,build_type='dot'):
     graph = get_nodes_and_edges()
     format = IMAGE_TYPES[format]['format']
-    mimetype = IMAGE_TYPES[format]#['mimetype']    
+    mimetype = IMAGE_TYPES[format]['mimetype']    
     image = graphviz.create_simplegraph(graph.to_string(),
         format=format,
         build_type=build_type)

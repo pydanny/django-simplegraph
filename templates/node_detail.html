@@ -7,7 +7,8 @@
     {% if request.user.is_authenticated %}
     ( <a href="">Edit Node</a>)
     {% endif %}
-    ( <a href="/edit/node/{{ node.name|urlencode }}">Edit Node</a>)    
+    ( <a href="/edit/node/{{ node.name|urlencode }}">Edit Node</a>)  
+    ( <a href="/csv/node/{{node.name|urlencode}}.csv">CSV</a> )  
 </h1>
 
 <p>{{ request.user }}</p>
@@ -53,15 +54,16 @@
     {% endif %}
 </ul>
 
-<a href="/graph/{{node.name|urlencode}}.svg">
-    <img src="/graph/{{node.name|urlencode}}.gif"
-    alt = "Click to get mapped graphic" border="1" />
-</a>
+
+
+
 </p>
+<object data="/graph/{{node.name|urlencode}}.svg" type="image/svg+xml"
+         name="bonehead" />
+<a href="/graph/{{node.name|urlencode}}.gif">Click to get IE view</a>         
+
 <h1>Other formats</h1>
 <p>
-    <a href="/csv/node/{{node.name|urlencode}}.csv">CSV</a>
-    
     
 </p>
 
