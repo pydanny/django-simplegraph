@@ -16,8 +16,11 @@ urlpatterns = patterns('',
     url(r'^csv/node/([A-Za-z\d\s\.\-]{1,30}).csv$', 'simplegraph.views.csv_node'),
     url(r'^import_csv/$', 'simplegraph.views.import_csv'),    
     
-    # edit features
+    # modification features
     url(r'^edit/node/([A-Za-z\d\s\.\-]{1,30})$', 'simplegraph.views.edit_node'),
+    url(r'^edit/node/edges/([A-Za-z\d\s\.\-]{1,30})$', 'simplegraph.views.edit_node_edges'),    
+    url(r'^add/node$', 'simplegraph.views.add_node'),
+    url(r'^add/edge/([A-Za-z\d\s\.\-]{1,30})$', 'simplegraph.views.add_edge'),    
     
 )
 

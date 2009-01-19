@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h1>
+    {{ action }}
+</h1>
+
+{% if message %}
+<p style="color:red;">{{ message }}</p>
+{% endif %}
+
+{% if parent_forms %}
+    <h2>Parents</h2>
+{% endif %}
+{% for parent_form in parent_forms  %}
+<form action="" method="post">
+    <table>
+    {{ parent_form }}
+    </table>    
+    <input type="submit" value="submit">
+</form>
+<hr />
+{% endfor %}
+
+<br /><br /><br />
+
+{% if child_forms %}
+    <h2>Children</h2>
+{% endif %}
+{% for child_form in child_forms  %}
+<form action="" method="post">
+    <table>
+    {{ child_form }}
+    </table>    
+    <input type="submit" value="submit">
+</form>
+<hr />
+{% endfor %}
+
+<object data="/graph/{{node.name|urlencode}}.svg" type="image/svg+xml"
+         name="bonehead" />
+
+{% endblock  %}

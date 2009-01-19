@@ -49,7 +49,22 @@
 		<div class="padded">
 
             {% block main %}
+                <!--
+                <h1>Search Nodes</h1>
+                response: 
+                <pre>
+                {{ request  }}
+                {{ response  }}
+                {{ node  }}
+                {{ locals }}
+                </pre>                
+                <form action="" method="GET">
+                    <input type="text" name="node" value="{{ request.GET.node }}" />
+                    <input type="submit" name="search" value="search" />
+                </form>
+                -->
                 <h1>Random Data Image</h1>
+                <a href="/add/node">Add a node</a>
                 <p>
                     <img src="/random_image" alt="random image" border="1" />                    
                 <p>

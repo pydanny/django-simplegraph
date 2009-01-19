@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h1>
+    {{ action }}
+</h1>
+
+{% if message %}
+<p style="color:red;">{{ message }}</p>
+{% endif %}
+
+<br /><br /><br />
+
+<form action="" method="post">
+    <table>
+    {{ parent_form }}
+    </table>    
+    <input type="submit" value="Add parent edge">
+</form>
+<hr />
+<br /><br /><br />
+
+<form action="" method="post">
+    <table>
+    {{ child_form }}
+    </table>    
+    <input type="submit" value="Add child edge">
+</form>
+
+
+{% endblock %}

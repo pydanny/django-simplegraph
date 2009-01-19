@@ -1,6 +1,6 @@
 from simplegraph.models import EdgeType, NodeLook
 
-EDGE_TYPES = ('EMAIL','FTP','LDAP','REST','SOAP','XMLRPC')
+EDGE_TYPES = ('EMAIL','FTP','LDAP','REST','SOAP','XMLRPC',)
 #n,d,c,s
 NODE_LOOKS = (
     dict(

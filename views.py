@@ -1,11 +1,11 @@
-from django.http import HttpResponse
+from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from simplegraph.models import Node, Edge, COLOR_CHOICES, SHAPE_CHOICES
 from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
 import csv
-from simplegraph.forms import NodeForm
+from simplegraph.forms import NodeForm, EdgeForm, ParentForm, ChildForm
 
 
 ############# Basics ############
@@ -163,9 +163,85 @@ def import_csv(request):
         return render_to_response('import_csv.html',{'nodes':stock_nodes,'report':report})
         
 def edit_node(request,name):
-    stock_nodes = Node.objects.all().order_by('name') 
-    node = get_object_or_404(Node, name=name)      
+    stock_nodes = Node.objects.all().order_by('name')      
+    node = get_object_or_404(Node, name=name)             
+    node_form = NodeForm(instance=node)            
+    message = ''
     if request.method == 'POST':
-        node.save()                        
-    node_form = NodeForm(instance=node)        
-    return render_to_response('node_form.html',{'nodes':stock_nodes,'node_form':node_form})    
+        node_form = NodeForm(request.POST,instance=node)                
+        if node_form.is_valid():
+            node_form.save()
+            message = '%s updated' % node.name            
+            try:
+                request.user.message_set(
+                    message = message
+                )
+                return render_to_response('node_form.html',
+                    {'nodes':stock_nodes,'node_form':node_form},
+                    context_instance=RequestContext(request))
+            except:
+                pass
+        else:
+            message = 'Validation error'
+    return render_to_response('node_form.html',{'nodes':stock_nodes,
+                                'node_form':node_form,
+                                'action':'Edit',
+                                'node':node,
+                                'message':message})
+                                                                  
+    
+def add_node(request):
+    stock_nodes = Node.objects.all().order_by('name')
+    message = ''
+    node_form = NodeForm()    
+    if request.method == 'POST':
+        node_form = NodeForm(request.POST)
+        if node_form.is_valid():
+            node_form.save()
+            name = request.POST['name']
+            message = '%s added' % name
+            return HttpResponseRedirect('/node/' + name)
+        else:
+            message = 'Validation error'
+            
+    return render_to_response('node_form.html',{'nodes':stock_nodes,
+                    'node_form':node_form,
+                    'action':'Add',
+                    'message':message})    
+                    
+def edit_node_edges(request,name):
+    stock_nodes = Node.objects.all().order_by('name')
+    node = get_object_or_404(Node, name=name)      
+    problem_edge = None
+    if request.method == 'POST':
+        edge = get_object_or_404(Edge, pk=request.POST['id'])      
+        edge_form = EdgeForm(request.POST,instance=edge)
+        if edge_form.is_valid:
+            edge_form.save()        
+    message = ''
+    parent_forms = []
+    child_forms = []    
+    for parent in Edge.objects.select_related().filter(child__name=name):
+        parent_forms.append(ParentForm(instance=parent))
+    for child in Edge.objects.select_related().filter(parent__name=name):
+        child_forms.append(ChildForm(instance=child))
+    return render_to_response('edges_form.html',{'nodes':stock_nodes,
+                                'message':message,
+                                'action':'Edit Edges',
+                                'node':node,
+                                'parent_forms':parent_forms,
+                                'child_forms':child_forms})  
+
+def add_edge(request,node_name):
+    stock_nodes = Node.objects.all().order_by('name') 
+    node = get_object_or_404(Node, name=node_name)
+    initial = {'child':node.child,'id':node.id}
+    parent_form = ParentForm(initial)
+    child_form = ChildForm()    
+    return render_to_response('edge_form.html',{
+            'nodes':stock_nodes,
+            'action':'Add Edges',
+            'parent_form':parent_form ,
+            'child_form':child_form
+        }
+    )
