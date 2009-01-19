@@ -1,0 +1,7 @@
+1. Create form handlers for all types
+2. Login to restrict who can edit graphs
+3. Finish import processing
+4. Integrate VML for IE handling
+5. Add ability for multiple graphs
+6. Front page search function for finding nodes
+7. AJAX where possible to speed up delivery

@@ -5,7 +5,6 @@ from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
 import csv
-from simplegraph.utils import get_rows_from_csv
 from simplegraph.forms import NodeForm
 
 
@@ -13,7 +12,8 @@ from simplegraph.forms import NodeForm
 
 IMAGE_TYPES = {
     'svg':dict(format='svg',mimetype="image/svg+xml"),
-    'gif':dict(format='gif',mimetype="image/gif")
+    'gif':dict(format='gif',mimetype="image/gif"),
+    'vml':dict(format='vml',mimetype="image/vml"),    
     }
 
 ############# Views ###############
