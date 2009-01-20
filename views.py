@@ -5,7 +5,7 @@ from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
 import csv
-from simplegraph.forms import NodeForm, EdgeForm, ParentForm, ChildForm
+from simplegraph.forms import NodeForm, EdgeForm, ParentForm, ChildForm, BaseEdgeForm
 
 
 ############# Basics ############
@@ -213,12 +213,13 @@ def edit_node_edges(request,name):
     stock_nodes = Node.objects.all().order_by('name')
     node = get_object_or_404(Node, name=name)      
     problem_edge = None
+    message = ''    
     if request.method == 'POST':
         edge = get_object_or_404(Edge, pk=request.POST['id'])      
         edge_form = EdgeForm(request.POST,instance=edge)
-        if edge_form.is_valid:
+        if edge_form.is_valid():
             edge_form.save()        
-    message = ''
+            message = '%s updated' % (edge)
     parent_forms = []
     child_forms = []    
     for parent in Edge.objects.select_related().filter(child__name=name):
@@ -232,16 +233,25 @@ def edit_node_edges(request,name):
                                 'parent_forms':parent_forms,
                                 'child_forms':child_forms})  
 
-def add_edge(request,node_name):
+def add_edge(request):
     stock_nodes = Node.objects.all().order_by('name') 
-    node = get_object_or_404(Node, name=node_name)
-    initial = {'child':node.child,'id':node.id}
-    parent_form = ParentForm(initial)
-    child_form = ChildForm()    
+    edge_form = BaseEdgeForm()
+    message = ''    
+    if request.method == 'POST':
+        edge_form = BaseEdgeForm(request.POST)
+        if edge_form.is_valid():
+            edge_form.save()
+            message = '%s added' % (edge)
     return render_to_response('edge_form.html',{
             'nodes':stock_nodes,
-            'action':'Add Edges',
-            'parent_form':parent_form ,
-            'child_form':child_form
+            'edge_form':edge_form,
+            'message':message
+        }
+    )
+    
+def list_nodes(request,name=None):
+    stock_nodes = Node.objects.all().order_by('name') 
+    return render_to_response('list_nodes.html',{
+            'nodes':stock_nodes,
         }
     )

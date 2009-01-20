@@ -1,26 +1,22 @@
+{% extends "base.html" %}
+
+{% block main %}
 
 
-{% block nav %}
-    <h1><a href="/">Home</a></h1>
-    
-    <ul>
-        <li><a href="/show_em_all">Show me everything</a></li>
-        <li><a href="/csv/graph.csv">Export CSV</a></li>
-        <li><a href="/import_csv">Import CSV</a></li>        
-    </ul>        
+<h1>List Nodes</h1>
+{% if nodes %}
+<table>    
+    {% for node in nodes %}    
+    <tr>
+        <td>
+            <a href="/node/{{ node.name|urlencode }}">{{ node.name }}</a>
+        </td>
+        <td>
+            <a href="/edit/node/{{ node.name|urlencode }}">Edit</a>
+        </td>
+    <tr>
+    {% endfor %}        
+</table>            
+{% endif %}
 
-
-    <h1>
-        <a href="/">Nodes</a>
-        ( <a href="/add/node">add</a> )
-    </h1>
-    {% if nodes %}
-        <ul>
-        {% for node in nodes %}
-            <li>
-                <a href="/node/{{ node.name|urlencode }}">{{ node.name }}</a>
-            </li>
-        {% endfor %}
-        </ul>
-    {% endif %}
 {% endblock %}

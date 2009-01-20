@@ -9,17 +9,22 @@ class NodeForm(forms.ModelForm):
     class Meta:
         model = Node
         
-class EdgeForm(forms.ModelForm):
+class BaseEdgeForm(forms.ModelForm):
+
+    class Meta:
+        model = Edge
+        
+class EdgeForm(BaseEdgeForm):
     
     id = forms.IntegerField(widget=forms.HiddenInput())
     
-    class Meta:
-        model = Edge
     
 class ParentForm(EdgeForm):
     
     child = forms.IntegerField(widget=forms.HiddenInput())
+      
     
 class ChildForm(EdgeForm):
 
     parent = forms.IntegerField(widget=forms.HiddenInput())    
+    

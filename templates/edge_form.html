@@ -3,7 +3,7 @@
 {% block main %}
 
 <h1>
-    {{ action }}
+    Add Edge
 </h1>
 
 {% if message %}
@@ -14,19 +14,14 @@
 
 <form action="" method="post">
     <table>
-    {{ parent_form }}
+    {{ edge_form }}
     </table>    
-    <input type="submit" value="Add parent edge">
+    <input type="submit" value="Add edge">
 </form>
 <hr />
 <br /><br /><br />
 
-<form action="" method="post">
-    <table>
-    {{ child_form }}
-    </table>    
-    <input type="submit" value="Add child edge">
-</form>
-
+<object data="/graph_all.svg" type="image/svg+xml"
+         name="bonehead" />
 
 {% endblock %}
