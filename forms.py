@@ -1,5 +1,5 @@
 from django import forms
-from simplegraph.models import Node, Edge, NodeLook, EdgeType
+from simplegraph.models import Node, Edge, NodeType, EdgeType
 
 class NodeForm(forms.ModelForm):
     

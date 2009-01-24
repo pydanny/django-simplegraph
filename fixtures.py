@@ -1,4 +1,4 @@
-from simplegraph.models import EdgeType, NodeLook
+from simplegraph.models import EdgeType, NodeType
 
 EDGE_TYPES = ('EMAIL','FTP','LDAP','REST','SOAP','XMLRPC',)
 #n,d,c,s

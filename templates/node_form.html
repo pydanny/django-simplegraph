@@ -2,7 +2,7 @@
 
 {% block main %}
 
-<h1>Edit Node Edges</h1>
+<h1>{{ action }} Node</h1>
 
 {% if message %}
 <p style="color:red;">{{ message }}</p>
@@ -19,9 +19,10 @@
 <hr />
 <br /><br />
 
+{% if action %}
 <object data="/graph/{{node.name|urlencode}}.svg" type="image/svg+xml"
          name="bonehead" />
 <a href="/graph/{{node.name|urlencode}}.gif">Click to get IE view</a>
-
+{% endif %}
 
 {% endblock  %}

@@ -28,7 +28,7 @@ SHAPE_CHOICES = (
     ('tab','tab'),
 )
         
-class NodeLook(models.Model):
+class NodeType(models.Model):
     name = models.CharField(max_length=30)
     description = models.TextField(blank=True)
     color = models.CharField(max_length=40,choices=COLOR_CHOICES)
@@ -43,7 +43,7 @@ class Node(models.Model):
     responsible_party = models.CharField(max_length=30,blank=True)
     responsible_party_email = models.EmailField(blank=True)  
     description = models.TextField(blank=True)      
-    node_look = models.ForeignKey(NodeLook,blank=True,null=True)
+    node_type = models.ForeignKey(NodeType,blank=True,null=True)
 
     def __unicode__(self):
         return self.name

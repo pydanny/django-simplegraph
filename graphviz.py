@@ -75,11 +75,15 @@ def cleanup(text):
 def get_node(name):
     # modify to accept orm_nodes
     node = GNode(cleanup(name))
-    orm_node = Node.objects.select_related().get(name=name)    
+    orm_node = Node.objects.select_related().get(name=name)
     node.set_URL('/node/'+name)
-    node.set_target('_parent')   
-    node.set_color(orm_node.node_look.color)
-    node.set_shape(orm_node.node_look.shape)
+    tooltip = '/n'.join(orm_node.description.splitlines())    
+    node.set_tooltip(tooltip)
+    node.set_target('_parent')
+    color = getattr(orm_node.node_type,"color","lightblue")
+    shape = getattr(orm_node.node_type,"shape","box")    
+    node.set_color(color)
+    node.set_shape(shape)
     node.set_style('filled')
     return node
 
@@ -123,6 +127,7 @@ def get_nodes_and_edges(name='my_graph'):
     edges = list(set(edges)) # remove duplicates   
     for edge in edges:
         e = Edge(edge[0],edge[1])
+        e.set_target('_parent')        
         e.set_arrowhead('vee')
         graph.add_edge(e)            
     return graph

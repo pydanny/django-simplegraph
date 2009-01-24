@@ -29,7 +29,11 @@
 			<p>An easy-to-use tool for mapping out relationships between any types of objects you can image. The current working views are HTML with Graphviz generated images. Future views include CSV, 3-d animations, and more.</p>
 
 			<h1>What is it built on?</h1>
-			<p>A select group of entirely open source components supported by various groups such as Google, Nasa, Microsoft, Sun, and the Hitss contract. Specifically, Python, Django, Graphviz, and Pydot.</p>
+			<p>A select group of entirely open source components supported by various groups such as Google, NASA, Microsoft, Sun, and the HITSS contract. Specifically, 
+	<a href="http://python.org">Python</a>,
+	<a href="http://djangoproject.com">Django</a>, 
+	<a href="http://graphviz.org">Graphviz</a>, and 
+	<a href="">Pydot</a>.</p>
 			
 			<h1>How do I make changes?</h1>
 			<p>You'll need to <a href="/admin">login</a> and play around.</p>
@@ -43,7 +47,7 @@
         <h1><a href="/">Home</a></h1>
 
         <ul>
-            <li><a href="/show_em_all">Show me everything</a></li>
+            <li><a href="{% url show_em_all %}">Show me everything</a></li>
             <li><a href="/csv/graph.csv">Export CSV</a></li>
             <li><a href="/import_csv">Import CSV</a></li>        
         </ul>        
@@ -53,7 +57,8 @@
             <a href="/list_nodes">Nodes</a>
         </h1>
         <ul>
-            <li><a href="/add/node">Add Edge</a></li>
+            <li><a href="{% url add_node %}">Add Node</a></li>            
+            <li><a href="{% url add_edge %}">Add Edge</a></li>
         </ul>
 
 
@@ -79,9 +84,11 @@
                 </form>
                 -->
                 <h1>Random Data Image</h1>
-                <a href="/add/node">Add a node</a>
+
                 <p>
-                    <img src="/random_image" alt="random image" border="1" />                    
+                    <a href="">
+                        <img src="{% url random_image %}" alt="random image" border="1" />  
+                    </a>                  
                 <p>
                 <p><a href="">Click to see another</a></p>
                 <h1>Color Options (many more to come)</h1>
