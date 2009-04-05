@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<h1>{{ node.name }}
+    
+    {% if request.user.is_authenticated %}
+    ( <a href="">Edit Node</a>)
+    {% endif %}
+    ( <a href="/edit/node/{{ node.name|urlencode }}">Edit Node</a> )  
+    ( <a href="/edit/node/edges/{{ node.name|urlencode }}">Edit edges</a> )
+    ( <a href="/csv/node/{{ node.name|urlencode }}.csv">CSV</a> )  
+</h1>
+
+<p>{{ request.user }}</p>
+
+<p>
+<ul>
+    <li>
+        <strong>Responsible Party</strong>: {{ responsible_party|safe }} 
+    </li>
+    {% if parents or children %}
+    <li>
+        {% if parents %}
+        <strong>Parents</strong>: 
+        <ul>
+            {% for parent in parents %}
+                <li>
+                    <a href="/node/{{ parent.parent|urlencode }}">{{parent.parent}}</a>
+                    ->
+                    <a href="/node/{{ parent.child|urlencode }}">{{parent.child}}</a>
+                    {% if parent.edge_type %}                
+                        ( {{parent.edge_type}} )
+                    {% endif %}
+                </li>
+            {% endfor %}            
+        </ul>
+        {% endif %}
+        {% if children %}
+        <strong>Children</strong>: 
+        <ul>
+            {% for child in children %}
+                <li>
+                    <a href="/node/{{ child.parent|urlencode }}">{{child.parent}}</a>
+                    ->
+                    <a href="/node/{{ child.child|urlencode }}">{{child.child}}</a>    
+                    {% if child.edge_type %}                
+                        ( {{child.edge_type}} )
+                    {% endif %}                                    
+                </li>
+            {% endfor %}            
+        </ul>
+        {% endif %}   
+    </li>
+    {% endif %}
+</ul>
+
+
+
+
+</p>
+<object data="/graph/{{node.name|urlencode}}.svg" type="image/svg+xml"
+         name="bonehead" />
+<a href="/graph/{{node.name|urlencode}}.gif">Click to get IE view</a>         
+
+<h1>Other formats</h1>
+<p>
+    
+</p>
+
+{% endblock  %}

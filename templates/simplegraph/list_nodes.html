@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+
+<h1>List Nodes</h1>
+{% if nodes %}
+<table border="3">    
+    {% for node in nodes %}    
+    <tr>
+        <td>
+            <a href="/node/{{ node.name|urlencode }}">{{ node.name }}</a>
+        </td>
+        <td>
+            <a href="/edit/node/{{ node.name|urlencode }}">Edit</a>
+        </td>
+        <td>
+            {{ node.child.valuess }}
+        </td>    
+    <tr>
+    {% endfor %}        
+</table>            
+{% endif %}
+
+{% endblock %}
