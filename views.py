@@ -4,7 +4,6 @@ from simplegraph.models import Node, Edge, COLOR_CHOICES, SHAPE_CHOICES
 from simplegraph import graphviz
 from simplegraph.graphviz import get_node, get_node_and_edges, get_nodes_and_edges
 import random
-import csv
 from simplegraph.forms import NodeForm, EdgeForm, ParentForm, ChildForm, BaseEdgeForm
 from datetime import datetime
 
@@ -47,7 +46,7 @@ def node_detail(request,name):
     elif node.responsible_party:
         responsible_party = node.responsible_party
     
-    return render_to_response('node_detail.html',{'node':node,
+    return render_to_response('simplegraph/node_detail.html',{'node':node,
             'parents':parents,
             'children':children,
             'responsible_party':responsible_party})
@@ -90,72 +89,6 @@ def show_em_all(request):
     # emdtest
     return render_to_response('show_em_all.html',{'image':image})    
     
-def csv_all(request):
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=export.csv'
-    writer = csv.writer(response)
-    writer.writerow(['NODE_ID','NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
-    for node in Node.objects.all().order_by('name'):
-        writer.writerow([node.pk,node.name, node.responsible_party, node.responsible_party_email, node.node_type, node.description])
-    writer.writerow([])
-    writer.writerow(['EDGE_ID','EDGE_PARENT','EDGE_CHILD','EDGE_TYPE'])
-    for edge in Edge.objects.all():
-        writer.writerow([edge.pk,edge.parent,edge.child,edge.edge_type])
-    return response
-    
-def csv_node(request,name):
-    response = HttpResponse(mimetype='text/csv')
-    response['Content-Disposition'] = 'attachment; filename=export.csv'
-    writer = csv.writer(response)
-    writer.writerow(['NODE_ID','NODE_NAME','RESPONSIBLE PARTY','RESPONSIBLE_PARTY_EMAIL','NODE_TYPE','DESCRIPTION'])
-    node = Node.objects.get(name=name)
-    writer.writerow([node.pk,node.name, node.responsible_party, node.responsible_party_email, node.node_type, node.description])
-    return response
-    
-def import_csv(request):  
-    if request.method == 'GET': 
-        
-        return render_to_response('import_csv.html',{'nodes':stock_nodes})
-    
-    if request.method == 'POST': 
-        report = []
-        row_type = ''
-        for i,row in enumerate(csv.reader(request.FILES['import_file'])):
-            if (i == 0) and row[0] == 'NODE_ID':
-                row_type = 'NODE'
-                continue
-            try:
-                if (i > 0) and row[0] == 'EDGE_ID':
-                    row_type = 'EDGE'
-                    continue
-            except:
-                continue
- 
-            if row_type == 'NODE':
-                nodes = Node.objects.filter(pk=row[0])
-                if not nodes:
-                    # add a node
-                    pass
-                elif len(nodes) == 1:
-                    # edit a node
-                    node = nodes[0]
-
-                    node.name = row[1] #'NODE_NAME'
-                    node.responsible_party = row[2]
-                    node.responsible_party_email = row[2]
-                    node.description = row[4]
-                    node.save()
-                    report.append(row[1] + ' updated.')
-                else:
-                    # report a problem
-                    pass
-
-                
-            if row_type == 'EDGE':
-                pass
- 
-            
-        return render_to_response('import_csv.html',{'report':report})
         
 def edit_node(request,name):     
     node = get_object_or_404(Node, name=name)             
@@ -177,7 +110,7 @@ def edit_node(request,name):
                 pass
         else:
             message = 'Validation error'
-    return render_to_response('node_form.html',{
+    return render_to_response('simplegraph/node_form.html',{
                                 'node_form':node_form,
                                 'action':'Edit',
                                 'node':node,
@@ -197,7 +130,7 @@ def add_node(request):
         else:
             message = 'Validation error'
             
-    return render_to_response('node_form.html',{
+    return render_to_response('simplegraph/node_form.html',{
                     'node_form':node_form,
                     'action':'Add',
                     'message':message})    
@@ -218,7 +151,7 @@ def edit_node_edges(request,name):
         parent_forms.append(ParentForm(instance=parent))
     for child in Edge.objects.select_related().filter(parent__name=name):
         child_forms.append(ChildForm(instance=child))
-    return render_to_response('edges_form.html',{
+    return render_to_response('simplegraph/edges_form.html',{
                                 'message':message,
                                 'action':'Edit Edges',
                                 'node':node,
@@ -233,7 +166,7 @@ def add_edge(request):
         if edge_form.is_valid():
             edge_form.save()
             message = 'Edge added'
-    return render_to_response('edge_form.html',{
+    return render_to_response('simplegraph/edge_form.html',{
             'edge_form':edge_form,
             'message':message
         }
